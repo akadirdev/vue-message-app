@@ -29,6 +29,19 @@
           </span>
         </span>
         <span key="comment-basic-reply-to">Reply to</span>
+        <span key="comment-basic-delete">
+          <a-popconfirm
+            title="Mesaj silinsin mi？"
+            okText="Sil"
+            cancelText="İptal"
+            @confirm="deleteMessage(messageObj)"
+          >
+            <template #icon
+              ><question-circle-outlined style="color: red"
+            /></template>
+            <DeleteOutlined />
+          </a-popconfirm>
+        </span>
       </template>
       <template #author
         ><a style="margin-left: 10px">{{ messageObj.user }}</a></template
@@ -63,10 +76,14 @@ import {
   DislikeFilled,
   DislikeOutlined,
   UserOutlined,
+  DeleteOutlined,
+  QuestionCircleOutlined,
 } from '@ant-design/icons-vue';
-import { ref } from 'vue';
+import { ref, defineEmits } from 'vue';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
+
+const emit = defineEmits(['deleteMessage']);
 
 const likes = ref(0);
 const dislikes = ref(0);
@@ -82,6 +99,10 @@ const dislike = () => {
   likes.value = 0;
   dislikes.value = 1;
   action.value = 'disliked';
+};
+
+const deleteMessage = (messageObj) => {
+  emit('deleteMessage', messageObj);
 };
 
 defineProps(['messageObj']);

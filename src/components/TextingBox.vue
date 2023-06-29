@@ -38,6 +38,7 @@ function sendMessage() {
   flex: 9;
   font-size: medium;
   resize: none;
+  overflow-y: hidden;
 }
 .send-btn {
   margin: 20px;

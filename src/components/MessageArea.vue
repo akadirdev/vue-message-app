@@ -1,7 +1,7 @@
 <template>
   <div id="message-area" class="message-area">
     <div v-for="msg in messages" :key="msg.date">
-      <MessageBox :messageObj="msg" />
+      <MessageBox :messageObj="msg" @deleteMessage="deleteMessage" />
     </div>
   </div>
 </template>
@@ -15,6 +15,13 @@ const messages = inject('messages');
 function scrollToEnd() {
   var container = document.querySelector('#message-area');
   container.scrollTop = container.scrollHeight;
+}
+
+function deleteMessage(msg) {
+  const msgIndex = messages.value.findIndex(
+    (f) => f.text === msg.text && f.date.toString() === msg.date.toString()
+  );
+  messages.value.splice(msgIndex, 1);
 }
 
 onUpdated(() => {
