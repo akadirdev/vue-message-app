@@ -9,6 +9,7 @@
 import MessageArea from '../components/MessageArea.vue';
 import TextingBox from '../components/TextingBox.vue';
 import { ref, provide, inject } from 'vue';
+import { socket } from '@/main';
 
 const store = inject('store');
 const messages = ref([]);
@@ -16,11 +17,13 @@ const messages = ref([]);
 provide('messages', messages);
 
 function addMessage(message) {
-  messages.value.push({
+  const msgObj = {
     text: message,
     user: store.state.username,
     date: new Date(),
-  });
+  };
+  messages.value.push(msgObj);
+  socket.emit('new-message', msgObj);
 }
 </script>
 <style scoped>
