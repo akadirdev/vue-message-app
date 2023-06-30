@@ -44,7 +44,7 @@
           </a-menu>
         </a-layout-sider>
         <a-layout-content style="padding: 0 24px; height: 100%">
-          <MessageSide style="height: 100%" />
+          <MessageSide :friendId="selectedKeys[0]" style="height: 100%" />
         </a-layout-content>
       </a-layout>
     </a-layout-content>
@@ -55,6 +55,7 @@
 </template>
 
 <script setup>
+import axios from 'axios';
 import { inject, onBeforeMount, ref, watch, provide } from 'vue';
 import {
   UserOutlined,
@@ -64,6 +65,9 @@ import {
 import { useRouter } from 'vue-router';
 import MessageSide from '../components/MessageSide.vue';
 import FriendSearchModal from '@/components/FriendSearchModal.vue';
+import { socket } from '@/main';
+import { serverUrl } from '@/config';
+import { message } from 'ant-design-vue';
 
 const router = useRouter();
 const store = inject('store');
@@ -72,6 +76,9 @@ const user = store.state.user;
 const selectedKeys = ref(['']);
 const openKeys = ref(['friends-menu']);
 const visible = ref(false);
+const messages = ref([]);
+
+provide('messages', messages);
 
 onBeforeMount(() => {
   if (!user.id) {
@@ -99,6 +106,30 @@ watch(selectedKeys, (newValue) => {
 });
 
 provide('visible', visible);
+
+socket.on('new-message-ack', function (data) {
+  console.log('new-message-added', data);
+  if (
+    (data.receiverUserId === store.state.user.id &&
+      data.senderUserId === selectedKeys.value[0]) ||
+    (data.senderUserId === store.state.user.id &&
+      data.receiverUserId === selectedKeys.value[0])
+  ) {
+    axios
+      .get(
+        `${serverUrl}/messages/${store.state.user.id}/with/${selectedKeys.value[0]}`
+      )
+      .then((response) => {
+        console.log('data', response.data);
+        messages.value = response.data;
+        message.success(`${selectedKeys.value[0]} arkadaş mesajlar çekildi.`);
+      })
+      .catch((error) => {
+        // errorNofication(error.response.data);
+        console.log('error', error);
+      });
+  }
+});
 </script>
 
 <style>

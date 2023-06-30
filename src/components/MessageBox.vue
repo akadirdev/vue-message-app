@@ -44,20 +44,23 @@
         </span>
       </template>
       <template #author
-        ><a style="margin-left: 10px">{{ messageObj.user }}</a></template
+        ><a style="margin-left: 10px">{{ msgOwner.username }}</a></template
       >
       <template #avatar>
         <a-avatar
           size="large"
-          :alt="messageObj.user"
-          style="margin-left: 10px; margin-top: 5px"
+          :style="{
+            backgroundColor: msgOwner.color,
+            marginLeft: '10px',
+            marginTop: '5px',
+          }"
         >
           <template #icon><UserOutlined /></template>
         </a-avatar>
       </template>
 
       <template #content>
-        <p style="margin-left: 10px">{{ messageObj.text }}</p>
+        <p style="margin-left: 10px">{{ messageObj.message }}</p>
       </template>
       <template #datetime>
         <a-tooltip :title="dayjs().format('YYYY-MM-DD HH:mm:ss')">
@@ -79,11 +82,13 @@ import {
   DeleteOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons-vue';
-import { ref, defineEmits } from 'vue';
+import { ref, defineEmits, inject, computed } from 'vue';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
+const store = inject('store');
 const emit = defineEmits(['deleteMessage']);
+const props = defineProps(['messageObj']);
 
 const likes = ref(0);
 const dislikes = ref(0);
@@ -101,11 +106,26 @@ const dislike = () => {
   action.value = 'disliked';
 };
 
-const deleteMessage = (messageObj) => {
-  emit('deleteMessage', messageObj);
-};
+const msgOwner = computed(function () {
+  if (store.state.user.id === props.messageObj.senderUserId) {
+    return {
+      username: store.state.user.username,
+      color: store.state.user.color,
+    };
+  }
 
-defineProps(['messageObj']);
+  const foundUser = store.state.user.friends.find(
+    (friend) => friend.id === props.messageObj.senderUserId
+  );
+  return {
+    username: foundUser.username,
+    color: foundUser.color,
+  };
+});
+
+const deleteMessage = (messageObj) => {
+  // emit('deleteMessage', messageObj);
+};
 </script>
 <style>
 .comment-box {

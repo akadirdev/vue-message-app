@@ -19,7 +19,8 @@ function scrollToEnd() {
 
 function deleteMessage(msg) {
   const msgIndex = messages.value.findIndex(
-    (f) => f.text === msg.text && f.date.toString() === msg.date.toString()
+    (f) =>
+      f.message === msg.message && f.date.toString() === msg.date.toString()
   );
   messages.value.splice(msgIndex, 1);
 }
