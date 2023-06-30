@@ -8,7 +8,7 @@
       >
       <a-input
         class="username-input"
-        v-model:value="store.state.username"
+        v-model:value.trim="username"
         placeholder="Kullanıcı Adı.."
       >
         <template #prefix>
@@ -28,16 +28,36 @@
 </template>
 
 <script setup>
-import { inject } from 'vue';
+import axios from 'axios';
+import { inject, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { UserOutlined, InfoCircleOutlined } from '@ant-design/icons-vue';
+import { serverUrl } from '@/config';
+import { notification } from 'ant-design-vue';
 
 const store = inject('store');
 const router = useRouter();
 
-function login() {
-  if (store.state.username !== '') router.push('/');
+const username = ref('');
+
+async function login() {
+  if (username.value !== '') {
+    const response = await axios
+      .post(`${serverUrl}/users/${username.value}`)
+      .then((response) => {
+        store.state.user = response.data;
+        router.push('/');
+      })
+      .catch((error) => loginErrorNofication(error.response.data));
+  }
 }
+
+const loginErrorNofication = (error) => {
+  notification['error']({
+    message: 'Login Error',
+    description: error.message,
+  });
+};
 </script>
 
 <style>

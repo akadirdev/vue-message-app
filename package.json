@@ -10,6 +10,7 @@
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
     "ant-design-vue": "^3.2.20",
+    "axios": "^1.4.0",
     "core-js": "^3.8.3",
     "dayjs": "^1.11.8",
     "socket.io-client": "^4.7.1",
